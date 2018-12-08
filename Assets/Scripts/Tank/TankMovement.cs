@@ -1,41 +1,60 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class TankMovement : MonoBehaviour
 {
-    public int m_PlayerNumber = 1;         
-    public float m_Speed = 12f;            
-    public float m_TurnSpeed = 180f;       
-    public AudioSource m_MovementAudio;    
-    public AudioClip m_EngineIdling;       
-    public AudioClip m_EngineDriving;      
+    //public variable
+    public int m_PlayerNumber = 1;
+    public float m_Speed = 12f;
+    public float m_OriginalSpeed = 12f;
+    public float m_TurnSpeed = 180f;
+    public AudioSource m_MovementAudio;
+    public AudioClip m_EngineIdling;
+    public AudioClip m_EngineDriving;
+
     public float m_PitchRange = 0.2f;
 
-    
-    private string m_MovementAxisName;     
-    private string m_TurnAxisName;         
-    private Rigidbody m_Rigidbody;         
-    private float m_MovementInputValue;    
-    private float m_TurnInputValue;        
-    private float m_OriginalPitch;         
+    //
+    //private variable
+    private string m_MovementAxisName;
+    private string m_TurnAxisName;
+    private string m_JumpButtonName;
+    private string m_AbilityButtonName;
+
+    private Rigidbody m_Rigidbody;
+
+    private float m_CdTime;
+    private float m_AbilityTime;
+    private float m_MovementInputValue;
+    private float m_TurnInputValue;
+    private bool m_JumpInputValue;
+    private bool m_AbilityInputValue;
+    private bool m_inAbility;
+
+    private float m_OriginalPitch;
+    //
 
 
-    private void Awake()//最先执行
+    private void Awake() //最先执行
     {
         m_Rigidbody = GetComponent<Rigidbody>();
     }
 
 
-    private void OnEnable ()//after Awake()
+    private void OnEnable() //after Awake()
     {
-        m_Rigidbody.isKinematic = false;//isKinematic is true，no forces can affect the rigidbody
+        m_Rigidbody.isKinematic = false; //isKinematic is true，no forces can affect the rigidbody
         m_MovementInputValue = 0f;
         m_TurnInputValue = 0f;
+        m_CdTime = 0f;
+        m_AbilityTime = 5f;
+        m_inAbility = false;
     }
 
 
-    private void OnDisable ()
+    private void OnDisable()
     {
         m_Rigidbody.isKinematic = true;
     }
@@ -45,17 +64,21 @@ public class TankMovement : MonoBehaviour
     {
         m_MovementAxisName = "Vertical" + m_PlayerNumber;
         m_TurnAxisName = "Horizontal" + m_PlayerNumber;
+        m_JumpButtonName = "Jump" + m_PlayerNumber;
+        m_AbilityButtonName = "Ability" + m_PlayerNumber;
 
         m_OriginalPitch = m_MovementAudio.pitch;
     }
-    
 
-    private void Update()//Running every rendered frame
+
+    private void Update() //Running every rendered frame
     {
         // Store the player's input and make sure the audio for the engine is playing.
-        m_MovementInputValue = Input.GetAxis(m_MovementAxisName);//used in fixed update
-        m_TurnInputValue = Input.GetAxis(m_TurnAxisName);//used in fixed update
-        
+        m_MovementInputValue = Input.GetAxis(m_MovementAxisName);
+        m_TurnInputValue = Input.GetAxis(m_TurnAxisName);
+        m_JumpInputValue = Input.GetButton(m_JumpButtonName);
+        m_AbilityInputValue = Input.GetButton(m_AbilityButtonName);
+
         EngineAudio();
     }
 
@@ -71,7 +94,6 @@ public class TankMovement : MonoBehaviour
                 m_MovementAudio.pitch = Random.Range(m_OriginalPitch - m_PitchRange, m_OriginalPitch + m_PitchRange);
                 m_MovementAudio.Play();
             }
-            
         }
         else
         {
@@ -85,7 +107,7 @@ public class TankMovement : MonoBehaviour
     }
 
 
-    private void FixedUpdate()//Running every physics step
+    private void FixedUpdate() //Running every physics step
     {
         // Move and turn the tank.
         Move();
@@ -96,10 +118,42 @@ public class TankMovement : MonoBehaviour
     private void Move()
     {
         // Adjust the position of the tank based on the player's input.
+
         Vector3 movement = transform.forward * m_MovementInputValue * m_Speed * Time.deltaTime;
-        
-        m_Rigidbody.MovePosition(m_Rigidbody.position+movement);
-        
+        m_CdTime += Time.deltaTime;
+//        print(m_Speed);
+
+        m_Rigidbody.MovePosition(m_Rigidbody.position + movement);
+
+        if (m_JumpInputValue && m_Rigidbody.velocity.y == 0f) //跳跃
+        {
+            m_Rigidbody.AddForce(0f, 400f, 0f);
+        }
+
+        //技能1
+        if (m_PlayerNumber == 1)
+        {
+            if (m_AbilityInputValue && m_CdTime >= 10f && !m_inAbility) 
+            {
+                m_Speed = 1.5f * m_Speed;
+                m_inAbility = true;
+            }
+
+            if (m_AbilityTime >= 0 && m_inAbility)
+            {
+                m_AbilityTime -= Time.deltaTime;
+            }
+
+            else if (m_AbilityTime < 0 && m_inAbility)
+            {
+                m_inAbility = false;
+                m_Speed = m_OriginalSpeed;
+                m_AbilityTime = 5f;
+                m_CdTime = 0f;
+            }
+        }
+
+        //
     }
 
 
@@ -109,7 +163,7 @@ public class TankMovement : MonoBehaviour
         float turn = m_TurnInputValue * m_TurnSpeed * Time.deltaTime;
 
         Quaternion turnRotation = Quaternion.Euler(0f, turn, 0f);
-        
+
         m_Rigidbody.MoveRotation(m_Rigidbody.rotation * turnRotation);
     }
 }
