@@ -24,10 +24,7 @@ public class TankHealth : MonoBehaviour
         m_ExplosionAudio = m_ExplosionParticles.GetComponent<AudioSource>();
 
         m_ExplosionParticles.gameObject.SetActive(false);
-        if (m_PlayerNumber == 2)
-        {
-            m_Slider.maxValue *= 5f;
-        }
+
     }
 
 
@@ -36,10 +33,11 @@ public class TankHealth : MonoBehaviour
         m_CurrentHealth = m_StartingHealth;
         if (m_PlayerNumber == 2)
         {
-            m_CurrentHealth *= 5f;
+            m_Slider.maxValue = 500f;
+            m_CurrentHealth = 500f;
         }
-        m_Dead = false;
 
+        m_Dead = false;
         SetHealthUI();
     }
     
@@ -58,7 +56,7 @@ public class TankHealth : MonoBehaviour
     }
 
 
-    private void SetHealthUI()
+    public void SetHealthUI()
     {
         // Adjust the value and colour of the slider.
         m_Slider.value = m_CurrentHealth;
@@ -70,6 +68,7 @@ public class TankHealth : MonoBehaviour
     private void OnDeath()
     {
         // Play the effects for the death of the tank and deactivate it.
+        print("dead");
         m_Dead = true;
 
         m_ExplosionParticles.transform.position = transform.position;

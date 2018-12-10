@@ -180,6 +180,7 @@
             <e p="ShellExplosion.cs" t="Include" />
           </e>
           <e p="Tank" t="Include">
+            <e p="TankAbility.cs" t="Include" />
             <e p="TankHealth.cs" t="Include" />
             <e p="TankMovement.cs" t="Include" />
             <e p="TankShooting.cs" t="Include" />

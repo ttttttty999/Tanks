@@ -9,20 +9,22 @@ public class TankShooting : MonoBehaviour
     public Slider m_AimSlider;           
     public AudioSource m_ShootingAudio;  
     public AudioClip m_ChargingClip;     
-    public AudioClip m_FireClip;         
+    public AudioClip m_FireClip;
     public float m_MinLaunchForce = 15f; 
     public float m_MaxLaunchForce = 30f; 
     public float m_MaxChargeTime = 0.75f;
 
-    
+
     private string m_FireButton;         
     private float m_CurrentLaunchForce;  
-    private float m_ChargeSpeed;         
+    private float m_ChargeSpeed;     
+    private float m_TimeCounter;
     private bool m_Fired;                
 
 
     private void OnEnable()
     {
+        m_TimeCounter = 0f;
         m_CurrentLaunchForce = m_MinLaunchForce;
         m_AimSlider.value = m_MinLaunchForce;
     }
@@ -40,29 +42,33 @@ public class TankShooting : MonoBehaviour
     {
         // Track the current state of the fire button and make decisions based on the current launch force.
         m_AimSlider.value = m_MinLaunchForce;
+        m_TimeCounter += Time.deltaTime;
 
-        if (m_CurrentLaunchForce >= m_MaxLaunchForce && !m_Fired)
+        if (m_TimeCounter >= 0.5f)
         {
-            m_CurrentLaunchForce = m_MaxLaunchForce;
-            Fire();
-        }
-        else if (Input.GetButtonDown(m_FireButton))
-        {
-            m_Fired = false;
-            m_CurrentLaunchForce = m_MinLaunchForce;
+            if (m_CurrentLaunchForce >= m_MaxLaunchForce && !m_Fired)
+            {
+                m_CurrentLaunchForce = m_MaxLaunchForce;
+                Fire();
+            }
+            else if (Input.GetButtonDown(m_FireButton))
+            {
+                m_Fired = false;
+                m_CurrentLaunchForce = m_MinLaunchForce;
 
-            m_ShootingAudio.clip = m_ChargingClip;
-            m_ShootingAudio.Play();
-        }
-        else if (Input.GetButton(m_FireButton) && !m_Fired)
-        {
-            m_CurrentLaunchForce += m_ChargeSpeed * Time.deltaTime;
+                m_ShootingAudio.clip = m_ChargingClip;
+                m_ShootingAudio.Play();
+            }
+            else if (Input.GetButton(m_FireButton) && !m_Fired)
+            {
+                m_CurrentLaunchForce += m_ChargeSpeed * Time.deltaTime;
 
-            m_AimSlider.value = m_CurrentLaunchForce;
-        }
-        else if (Input.GetButtonUp(m_FireButton) && !m_Fired)
-        {
-            Fire();
+                m_AimSlider.value = m_CurrentLaunchForce;
+            }
+            else if (Input.GetButtonUp(m_FireButton) && !m_Fired)
+            {
+                Fire();
+            }
         }
         
     }
@@ -71,6 +77,7 @@ public class TankShooting : MonoBehaviour
     private void Fire()
     {
         // Instantiate and launch the shell.
+        m_TimeCounter = 0f;
         m_Fired = true;
 
         Rigidbody shellinstance = Instantiate(m_Shell, m_FireTransform.position, m_FireTransform.rotation);

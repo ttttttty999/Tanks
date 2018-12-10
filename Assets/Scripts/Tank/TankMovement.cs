@@ -21,17 +21,12 @@ public class TankMovement : MonoBehaviour
     private string m_MovementAxisName;
     private string m_TurnAxisName;
     private string m_JumpButtonName;
-    private string m_AbilityButtonName;
 
     private Rigidbody m_Rigidbody;
 
-    private float m_CdTime;
-    private float m_AbilityTime;
     private float m_MovementInputValue;
     private float m_TurnInputValue;
     private bool m_JumpInputValue;
-    private bool m_AbilityInputValue;
-    private bool m_inAbility;
 
     private float m_OriginalPitch;
     //
@@ -48,9 +43,6 @@ public class TankMovement : MonoBehaviour
         m_Rigidbody.isKinematic = false; //isKinematic is true，no forces can affect the rigidbody
         m_MovementInputValue = 0f;
         m_TurnInputValue = 0f;
-        m_CdTime = 0f;
-        m_AbilityTime = 5f;
-        m_inAbility = false;
     }
 
 
@@ -65,7 +57,6 @@ public class TankMovement : MonoBehaviour
         m_MovementAxisName = "Vertical" + m_PlayerNumber;
         m_TurnAxisName = "Horizontal" + m_PlayerNumber;
         m_JumpButtonName = "Jump" + m_PlayerNumber;
-        m_AbilityButtonName = "Ability" + m_PlayerNumber;
 
         m_OriginalPitch = m_MovementAudio.pitch;
     }
@@ -77,7 +68,6 @@ public class TankMovement : MonoBehaviour
         m_MovementInputValue = Input.GetAxis(m_MovementAxisName);
         m_TurnInputValue = Input.GetAxis(m_TurnAxisName);
         m_JumpInputValue = Input.GetButton(m_JumpButtonName);
-        m_AbilityInputValue = Input.GetButton(m_AbilityButtonName);
 
         EngineAudio();
     }
@@ -120,7 +110,6 @@ public class TankMovement : MonoBehaviour
         // Adjust the position of the tank based on the player's input.
 
         Vector3 movement = transform.forward * m_MovementInputValue * m_Speed * Time.deltaTime;
-        m_CdTime += Time.deltaTime;
 //        print(m_Speed);
 
         m_Rigidbody.MovePosition(m_Rigidbody.position + movement);
@@ -129,31 +118,6 @@ public class TankMovement : MonoBehaviour
         {
             m_Rigidbody.AddForce(0f, 400f, 0f);
         }
-
-        //技能1
-        if (m_PlayerNumber == 1)
-        {
-            if (m_AbilityInputValue && m_CdTime >= 10f && !m_inAbility) 
-            {
-                m_Speed = 1.5f * m_Speed;
-                m_inAbility = true;
-            }
-
-            if (m_AbilityTime >= 0 && m_inAbility)
-            {
-                m_AbilityTime -= Time.deltaTime;
-            }
-
-            else if (m_AbilityTime < 0 && m_inAbility)
-            {
-                m_inAbility = false;
-                m_Speed = m_OriginalSpeed;
-                m_AbilityTime = 5f;
-                m_CdTime = 0f;
-            }
-        }
-
-        //
     }
 
 

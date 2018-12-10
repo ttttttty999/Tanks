@@ -45,7 +45,7 @@ public class ShellExplosion : MonoBehaviour
             
             targeHealth.TakeDamage(damage);
         }
-
+        
         m_ExplosionParticles.transform.parent = null;
         
         m_ExplosionParticles.Play();
