@@ -60,7 +60,7 @@ public class TankShooting : MonoBehaviour
 
             m_AimSlider.value = m_CurrentLaunchForce;
         }
-        else if (Input.GetButtonUp(m_FireButton))
+        else if (Input.GetButtonUp(m_FireButton) && !m_Fired)
         {
             Fire();
         }
