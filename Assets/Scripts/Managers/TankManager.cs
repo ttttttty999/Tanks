@@ -5,7 +5,8 @@ using UnityEngine;
 public class TankManager
 {
     public Color m_PlayerColor;            
-    public Transform m_SpawnPoint;         
+    public Transform m_SpawnPoint;
+    public float DeathTime = 3f;       //RyougiT  
     [HideInInspector] public int m_PlayerNumber;             
     [HideInInspector] public string m_ColoredPlayerText;
     [HideInInspector] public GameObject m_Instance;          // Save instance of the tank
@@ -42,8 +43,6 @@ public class TankManager
             renderers[i].material.color = m_PlayerColor;
         }
     }
-
-
     public void DisableControl()
     {
         m_Movement.enabled = false;
@@ -60,7 +59,6 @@ public class TankManager
 
         m_CanvasGameObject.SetActive(true);
     }
-
 
     public void Reset()
     {
