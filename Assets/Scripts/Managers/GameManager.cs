@@ -6,20 +6,21 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    public int m_NumRoundsToWin = 5;        
-    public float m_StartDelay = 3f;         
-    public float m_EndDelay = 3f;           
-    public CameraControl m_CameraControl;   
-    public Text m_MessageText;              
-    public GameObject[] m_TankPrefab;         
-    public TankManager[] m_Tanks;           
+    public int m_NumRoundsToWin = 5;
+    public float m_GameTime = 180f; //RyougiT
+    public float m_StartDelay = 3f;
+    public float m_EndDelay = 3f;
+    public CameraControl m_CameraControl;
+    public Text m_MessageText;
+    public GameObject[] m_TankPrefab;
+    public TankManager[] m_Tanks;
 
 
-    private int m_RoundNumber;              
-    private WaitForSeconds m_StartWait;     
-    private WaitForSeconds m_EndWait;       
+    private int m_RoundNumber;
+    private WaitForSeconds m_StartWait;
+    private WaitForSeconds m_EndWait;
     private TankManager m_RoundWinner;
-    private TankManager m_GameWinner;       
+    private TankManager m_GameWinner;
 
 
     private void Start()
@@ -79,12 +80,12 @@ public class GameManager : MonoBehaviour
     {
         ResetAllTanks();
         DisableTankControl();
-        
+
         m_CameraControl.SetStartPositionAndSize();
 
         m_RoundNumber++;
         m_MessageText.text = "ROUND " + m_RoundNumber;
-        
+
         yield return m_StartWait;
     }
 
@@ -95,13 +96,12 @@ public class GameManager : MonoBehaviour
 
         m_MessageText.text = string.Empty;
 
-        while (!OneTankLeft())
+        while (!TimeEnd())//RyougiT
         {
             yield return null;
         }
-        
-    }
 
+    }
 
     private IEnumerator RoundEnding()
     {
@@ -121,12 +121,12 @@ public class GameManager : MonoBehaviour
         string message = EndMessage();
 
         m_MessageText.text = message;
-        
+
         yield return m_EndWait;
     }
 
 
-    private bool OneTankLeft()
+    /*private bool OneTankLeft()
     {
         int numTanksLeft = 0;
 
@@ -138,7 +138,30 @@ public class GameManager : MonoBehaviour
 
         return numTanksLeft <= 1;
     }
+    */
 
+    //RyougiT  //控制游戏时间，同时控制复活时间
+    private bool TimeEnd()
+    {
+        m_GameTime -= Time.deltaTime;
+        for (int i = 0; i < m_Tanks.Length; i++)
+        {
+            if (!m_Tanks[i].m_Instance.activeSelf)
+            {
+                if (m_Tanks[i].DeathTime < 0)
+                {
+                    m_Tanks[i].Reset();
+                    m_Tanks[i].DeathTime = 3f;
+                }
+                else
+                {
+                    m_Tanks[i].DeathTime -= Time.deltaTime;
+                }
+            }
+        }
+        return m_GameTime < 0;
+    }
+    //RyougiT
 
     private TankManager GetRoundWinner()
     {
