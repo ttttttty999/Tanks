@@ -9,7 +9,7 @@ public class ShellExplosion : MonoBehaviour
     public float m_MaxDamage = 100f;                  
     public float m_ExplosionForce = 1000f;            
     public float m_MaxLifeTime = 2f;                  
-    public float m_ExplosionRadius = 5f;              
+    public float m_ExplosionRadius = 5f;
 
 
     private void Start()
@@ -35,15 +35,24 @@ public class ShellExplosion : MonoBehaviour
             targetRigidbody.AddExplosionForce(m_ExplosionForce, transform.position, m_ExplosionRadius);
 
             TankHealth targeHealth = targetRigidbody.GetComponent<TankHealth>();
+            BoxHealth boxHealth = targetRigidbody.GetComponent<BoxHealth>();
 
-            if (!targeHealth)
+            if (!targeHealth && !boxHealth)
             {
                 continue;
             }
 
             float damage = CalculateDamage(targetRigidbody.position);
+
+            if (targeHealth)
+            {
+                targeHealth.TakeDamage(damage);
+            }
+            else if (boxHealth)
+            {
+                boxHealth.TakeDamage(damage);
+            }
             
-            targeHealth.TakeDamage(damage);
         }
         
         m_ExplosionParticles.transform.parent = null;

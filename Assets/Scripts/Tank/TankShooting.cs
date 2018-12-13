@@ -81,6 +81,15 @@ public class TankShooting : MonoBehaviour
         m_Fired = true;
 
         Rigidbody shellinstance = Instantiate(m_Shell, m_FireTransform.position, m_FireTransform.rotation);
+        ShellExplosion shellExplosion = shellinstance.GetComponent<ShellExplosion>();
+        if (m_PlayerNumber == 1)
+        {
+            shellExplosion.m_MaxDamage = 100f;
+        }
+        else
+        {
+            shellExplosion.m_MaxDamage = 75f;
+        }
         shellinstance.velocity = m_CurrentLaunchForce * m_FireTransform.forward;
 
         m_ShootingAudio.clip = m_FireClip;

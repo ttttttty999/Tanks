@@ -30,12 +30,13 @@ public class TankHealth : MonoBehaviour
 
     private void OnEnable()
     {
-        m_CurrentHealth = m_StartingHealth;
+
         if (m_PlayerNumber == 2)
         {
-            m_Slider.maxValue = 500f;
-            m_CurrentHealth = 500f;
+            m_StartingHealth = 500f;
+            m_Slider.maxValue = m_StartingHealth;
         }
+        m_CurrentHealth = m_StartingHealth;
 
         m_Dead = false;
         SetHealthUI();

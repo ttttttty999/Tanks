@@ -169,6 +169,9 @@
           </e>
         </e>
         <e p="Scripts" t="Include">
+          <e p="Boxes" t="Include">
+            <e p="BoxHealth.cs" t="Include" />
+          </e>
           <e p="Camera" t="Include">
             <e p="CameraControl.cs" t="Include" />
           </e>
